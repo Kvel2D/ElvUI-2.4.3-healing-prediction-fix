@@ -121,6 +121,8 @@ local function HealComm_Heal_Update(event, healerName, healSize, endTime, ...)
 		playerTarget = ...
 	elseif event == "HealComm_DirectHealStop" and healerName == playerName then
 		playerIsCasting = false
+	elseif event == "HealComm_DirectHealInterrupt" and healerName == playerName then
+		playerIsCasting = false
 	end
 
 	MultiUpdate(...)
@@ -168,4 +170,5 @@ oUF:AddElement("HealComm3", Path, Enable, Disable)
 healComm.RegisterCallback("HealComm3", "HealComm_DirectHealStart", HealComm_Heal_Update)
 healComm.RegisterCallback("HealComm3", "HealComm_DirectHealUpdate", HealComm_Heal_Update)
 healComm.RegisterCallback("HealComm3", "HealComm_DirectHealStop", HealComm_Heal_Update)
+healComm.RegisterCallback("HealComm3", "HealComm_DirectHealInterrupt", HealComm_Heal_Update)
 healComm.RegisterCallback("HealComm3", "HealComm_HealModifierUpdate", HealComm_Modified)

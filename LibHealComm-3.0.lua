@@ -40,6 +40,7 @@ if (isHealer) then
 	lib.EventFrame:RegisterEvent("UNIT_SPELLCAST_START");
 	lib.EventFrame:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED");
 	lib.EventFrame:RegisterEvent("UNIT_SPELLCAST_STOP");
+	lib.EventFrame:RegisterEvent("UNIT_SPELLCAST_INTERRUPTED");
 end
 
 
@@ -1246,6 +1247,22 @@ function lib:UNIT_SPELLCAST_STOP(unit, spellName)
 			self.Callbacks:Fire("HealComm_DirectHealStop", playerName, CastInfoHealingSize, false, unpack(CastInfoHealingTargetNames));
 		elseif (CastInfoHealingTargetNames) then
 			self.Callbacks:Fire("HealComm_DirectHealStop", playerName, CastInfoHealingSize, false, CastInfoHealingTargetNames);
+		end
+	end
+end
+
+function lib:UNIT_SPELLCAST_INTERRUPTED(unit, spellName)
+	-- Ignore locally generated STOP events (contains spellName)
+	-- Instead wait for server generated STOP or SUCCEEDED
+	-- if (spellName) then return end
+
+	if (unit == "player" and CastInfoIsCasting) then
+		CastInfoIsCasting = false;
+		commSend("001F");
+		if (type(CastInfoHealingTargetNames) == "table") then
+			self.Callbacks:Fire("HealComm_DirectHealInterrupt", playerName, CastInfoHealingSize, false, unpack(CastInfoHealingTargetNames));
+		elseif (CastInfoHealingTargetNames) then
+			self.Callbacks:Fire("HealComm_DirectHealInterrupt", playerName, CastInfoHealingSize, false, CastInfoHealingTargetNames);
 		end
 	end
 end
